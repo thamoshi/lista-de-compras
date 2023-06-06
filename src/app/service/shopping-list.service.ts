@@ -6,32 +6,57 @@ import { Injectable } from '@angular/core';
 })
 export class ShoppingListService {
 
-  private shoppingList: Item[] = [
-    {
-      id: 1,
-      name: "Queijo prato",
-      date: "Segunda-feira (31/10/2022) às 08:30",
-      bought: false
-    },
-    {
-      id: 2,
-      name: "Leite integral",
-      date: "Segunda-feira (31/10/2022) às 08:30",
-      bought: false
-    },
-    {
-      id: 3,
-      name: "Mamão papaia",
-      date: "Segunda-feira (31/10/2022) às 08:30",
-      bought: true
-    },
-  ]
+  private shoppingList!: Item[]
 
   constructor() {
-    console.log('Instanciando dependências necessárias para o serviço.');
+    this.shoppingList = JSON.parse(localStorage.getItem('items') || '[]')
   }
 
-  getListaDeCompra(){
+  getShoppingList(){
     return this.shoppingList;
+  }
+
+  createItem(itemName: string) {
+    const id = this.shoppingList.length + 1 
+    const item: Item = {
+      id, 
+      name: itemName,
+      date: new Date().toLocaleString('pt-BR'),
+      bought: false
+    }
+    return item
+  }
+
+  addItemToShoppingList(itemName: string) {
+    const item = this.createItem(itemName)
+    this.shoppingList.push(item)
+  }
+
+  editShoppingListItem(oldItem: Item, editedItemName: string) {
+    const editedItem: Item = {
+      id: oldItem.id,
+      name: editedItemName,
+      date: oldItem.date,
+      bought: oldItem.bought
+    }
+    const id = oldItem.id
+
+    this.shoppingList.splice(Number(id)-1, 1, editedItem);
+  }
+
+  buyShoppingListItem(item: Item) {
+    const editedItem: Item = {
+      id: item.id,
+      name: item.name,
+      date: item.date,
+      bought: !item.bought
+    }
+    const id = item.id
+
+    this.shoppingList.splice(Number(id)-1, 1, editedItem);
+  }
+
+  saveLocalStorage() {
+    localStorage.setItem('items', JSON.stringify(this.shoppingList))
   }
 }
